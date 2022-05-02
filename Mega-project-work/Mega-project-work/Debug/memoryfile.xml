@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<project>                                  
+  <executable name="Mega-project-work.elf">                 
+    <memory name="program">              
+      <units>bytes</units>                 
+      <length>262144</length>                 
+      <used>3239</used>                     
+      <free>258905</free>                     
+    </memory>                              
+    <memory name="data">                 
+      <units>bytes</units>                 
+      <length>8192</length>                 
+      <used>41</used>                     
+      <free>8151</free>                     
+    </memory>                              
+  </executable>                            
+</project>                                 
