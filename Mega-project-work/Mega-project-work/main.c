@@ -19,6 +19,8 @@
 
 volatile int8_t g_STATE = 0;
 
+#define SLAVE_ADDRESS 85 // 0b1010101
+
 #define ARMED 0
 #define MOTIONDETECTED 1
 #define DISARMED 2
@@ -125,7 +127,7 @@ input_password(int password_length){
 			PORTB &=  ~(1 << PB5);
 		}
 		
-		// Backspace, if "*" is received, removes the number inputted
+		// Backspace, if "*" is received, removes the last number inputted
 		else if (temp_read == 42 && index >= 1)
 		{
 			PORTB |=  (1 << PB7);
@@ -165,6 +167,94 @@ compare_passwords(int8_t stored_password[], int8_t given_password[], int passwor
 	return 1;
 }
 
+void
+transmit_to_uno(int8_t status)
+{
+	USART_init(MYUBRR);
+	stdout = &uart_output;
+	stdin = &uart_input;
+	
+    unsigned char twi_send_data[20] = "MOTION DETECTED\n";
+    char test_char_array[16]; // 16-bit array, assumes that the int given is 16-bits
+    uint8_t twi_status = 0;
+		
+    // Initialize TWI
+    // set SCL frequency to 400 kHz, using equation in p. 242 of ATmega2560 datasheet
+    TWSR = 0x00; // TWI status register prescaler value set to 1
+    TWBR = 0x03; // TWI bit rate register.
+    TWCR |= (1 << TWEN); // enable TWI
+    // TWCR |= (1 << 2);
+        
+    // Start transmission by sending START condition
+    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+    // TWCR = (1 << 7) | (1 << 5) | (1 << 2);
+        
+    // wait for the TWINT to set
+    while (!(TWCR & (1 << TWINT)))
+    {
+	    ;
+    }
+        
+    // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
+    // only the status bits are read
+    twi_status = (TWSR & 0xF8);
+        
+    // print the status bits to the UART for monitoring
+    itoa(twi_status, test_char_array, 16);
+        
+    // Send slave address and write command to enter MT mode
+    TWDR = 0b10101010; // load slave address and write command
+    // Slave address = 85 + write bit '0' as a LSB ---> 170
+        
+    // clear TWINT to start transmitting the slave address + write command
+    TWCR = (1 << TWINT) | (1 << TWEN);
+    // TWCR = (1 << 7) | (1 << 2);
+        
+    // wait for the TWINT to set
+    while (!(TWCR & ( 1<< TWINT)))
+    {
+	    ;
+    }
+        
+    // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
+    // only the status bits are read
+    twi_status = (TWSR & 0xF8);
+        
+    itoa(twi_status, test_char_array, 16);
+    printf(test_char_array);
+    printf(" ");
+        
+    // transmit data to the slave
+    for(int8_t twi_data_index = 0; twi_data_index < sizeof(twi_send_data); twi_data_index++)
+    {
+	        
+	    TWDR = twi_send_data[twi_data_index]; // load data
+	        
+	    // "clear" TWINT to start transmitting the data
+	    TWCR = (1 << TWINT) | (1 << TWEN);
+	    // TWCR = (1 << 7) | (1 << 2);
+	        
+	    // wait for the TWINT to set
+	    while (!(TWCR & ( 1<< TWINT)))
+	    {
+		    ;
+	    }
+
+	    // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
+	    // only the status bits are read
+	    twi_status = (TWSR & 0xF8);
+	    itoa(twi_status, test_char_array, 16);
+	    printf(test_char_array);
+	    printf(" ");
+	        
+    }
+        
+    // stop transmission by sending STOP
+    TWCR = (1 << TWINT) | (1 << TWSTO) |(1 << TWEN);
+    //TWCR = (1 << 7) | (1 << 4) |(1 << 2);
+    printf("\n\r");
+}
+
 int
 main(void)
 {
@@ -191,6 +281,8 @@ main(void)
 	bool password_state = 0;
 	
 	int password_length = 4;
+	
+	int8_t status;
 	
 	// Defining the password for the alarm system
 	int8_t stored_password[4];
@@ -221,9 +313,11 @@ main(void)
 			break;
 		  
 			case MOTIONDETECTED:
+				status = 1;
+				// transmit_to_uno(status);
 				printf("State: MOTIONDETECTED\n\r");
 				PORTB |=  (1 << PB7);
-				_delay_ms(1000);
+				_delay_ms(500);
 				
 				input_password(password_length);
 				
@@ -232,10 +326,6 @@ main(void)
 				{
 					PORTB |=   (1 << PB6);
 					g_STATE = 2;
-				}
-				else
-				{
-					g_STATE = 0;
 				}
 				
 			break;
