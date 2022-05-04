@@ -253,6 +253,7 @@ transmit_to_uno(int8_t status)
     TWCR = (1 << TWINT) | (1 << TWSTO) |(1 << TWEN);
     //TWCR = (1 << 7) | (1 << 4) |(1 << 2);
     printf("\n\r");
+	return;
 }
 
 int
@@ -314,7 +315,7 @@ main(void)
 		  
 			case MOTIONDETECTED:
 				status = 1;
-				// transmit_to_uno(status);
+				transmit_to_uno(status);
 				printf("State: MOTIONDETECTED\n\r");
 				PORTB |=  (1 << PB7);
 				_delay_ms(500);

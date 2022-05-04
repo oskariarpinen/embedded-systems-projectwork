@@ -142,13 +142,8 @@ receive_data_from_mega()
     }
 
     // if twi_index indicates that the twi_receive_data is full, print to PuTTY
-    if (20 <= twi_index)
-    {
-	        
-	    printf(twi_receive_data);
-	    twi_index = 0;
-	        
-    }
+	printf(twi_receive_data);
+	twi_index = 0;
 
 }
 
