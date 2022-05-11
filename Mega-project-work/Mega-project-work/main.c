@@ -79,7 +79,7 @@ FILE uart_input = FDEV_SETUP_STREAM(NULL, USART_Receive, _FDEV_SETUP_READ);
 void
 input_password(int password_length){
 	
-	/* This function is resposible for the keypad password input */
+	/* This function is responsible for the keypad password input */
 	
 	int index = 0;
 	int8_t temp_read = 122;
@@ -95,8 +95,7 @@ input_password(int password_length){
 	
 	while (1)
 	{
-		printf("%c%c%c%c \n\r",g_user_given_password[0],g_user_given_password[1],g_user_given_password[2],g_user_given_password[3]);
-		// Get keypress using the provided keypad functions
+		// Get key press using the provided keypad function
 		temp_read = KEYPAD_GetKey();
 		
 		// If the press is "#", exits the input loop
@@ -114,8 +113,6 @@ input_password(int password_length){
 			// Store the number to the current index position
 			g_user_given_password[index] = temp_read;
 			index++;
-			printf("%c",temp_read);
-			printf("\n\r");
 			
 			// Wait until the key is depressed 
 			while(temp_read != 122)
@@ -167,95 +164,6 @@ compare_passwords(int8_t stored_password[], int8_t given_password[], int passwor
 	return 1;
 }
 
-void
-transmit_to_uno(int8_t status)
-{
-	USART_init(MYUBRR);
-	stdout = &uart_output;
-	stdin = &uart_input;
-	
-    unsigned char twi_send_data[20] = "MOTION DETECTED\n";
-    char test_char_array[16]; // 16-bit array, assumes that the int given is 16-bits
-    uint8_t twi_status = 0;
-		
-    // Initialize TWI
-    // set SCL frequency to 400 kHz, using equation in p. 242 of ATmega2560 datasheet
-    TWSR = 0x00; // TWI status register prescaler value set to 1
-    TWBR = 0x03; // TWI bit rate register.
-    TWCR |= (1 << TWEN); // enable TWI
-    // TWCR |= (1 << 2);
-        
-    // Start transmission by sending START condition
-    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
-    // TWCR = (1 << 7) | (1 << 5) | (1 << 2);
-        
-    // wait for the TWINT to set
-    while (!(TWCR & (1 << TWINT)))
-    {
-	    ;
-    }
-        
-    // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
-    // only the status bits are read
-    twi_status = (TWSR & 0xF8);
-        
-    // print the status bits to the UART for monitoring
-    itoa(twi_status, test_char_array, 16);
-        
-    // Send slave address and write command to enter MT mode
-    TWDR = 0b10101010; // load slave address and write command
-    // Slave address = 85 + write bit '0' as a LSB ---> 170
-        
-    // clear TWINT to start transmitting the slave address + write command
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    // TWCR = (1 << 7) | (1 << 2);
-        
-    // wait for the TWINT to set
-    while (!(TWCR & ( 1<< TWINT)))
-    {
-	    ;
-    }
-        
-    // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
-    // only the status bits are read
-    twi_status = (TWSR & 0xF8);
-        
-    itoa(twi_status, test_char_array, 16);
-    printf(test_char_array);
-    printf(" ");
-        
-    // transmit data to the slave
-    for(int8_t twi_data_index = 0; twi_data_index < sizeof(twi_send_data); twi_data_index++)
-    {
-	        
-	    TWDR = twi_send_data[twi_data_index]; // load data
-	        
-	    // "clear" TWINT to start transmitting the data
-	    TWCR = (1 << TWINT) | (1 << TWEN);
-	    // TWCR = (1 << 7) | (1 << 2);
-	        
-	    // wait for the TWINT to set
-	    while (!(TWCR & ( 1<< TWINT)))
-	    {
-		    ;
-	    }
-
-	    // read the status from TWI status register, 0xF8 is used to mask prescaler bits so that
-	    // only the status bits are read
-	    twi_status = (TWSR & 0xF8);
-	    itoa(twi_status, test_char_array, 16);
-	    printf(test_char_array);
-	    printf(" ");
-	        
-    }
-        
-    // stop transmission by sending STOP
-    TWCR = (1 << TWINT) | (1 << TWSTO) |(1 << TWEN);
-    //TWCR = (1 << 7) | (1 << 4) |(1 << 2);
-    printf("\n\r");
-	return;
-}
-
 int
 main(void)
 {
@@ -263,6 +171,13 @@ main(void)
 	USART_init(MYUBRR);
 	stdout = &uart_output;
 	stdin = &uart_input;
+	// SPI COMMUNICATION //
+	/* set SS, MOSI and SCK as output, pins 53 (PB0), 51 (PB2) and 52 (PB1) */
+	DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2); // SS as output
+	/* set SPI enable and master/slave select, making MEGA the master */
+	SPCR |= (1 << 6) | (1 << 4);
+	/* set SPI clock rate to 1 MHz */
+	SPCR |= (1 << 0);
 	
 	// Defining the keypad pins as input
 	DDRK = 0b00000000;
@@ -292,6 +207,8 @@ main(void)
 	stored_password[2] = 51;
 	stored_password[3] = 52;
 	
+	unsigned int spi_send_data = 1;
+	
 	while (1)
 	{
 		/* 
@@ -299,6 +216,19 @@ main(void)
 			Three different states: ARMED, MOTIONDETECTED and DISARMED
 		*/
 		
+		/* send byte to slave and receive a byte from slave */
+		PORTB &= ~(1 << PB0); // SS LOW
+		for(int8_t spi_data_index = 0; spi_data_index < sizeof(spi_send_data); spi_data_index++)
+		{
+			
+			SPDR = spi_send_data; // send byte using SPI data register
+			
+			while(!(SPSR & (1 << SPIF)))
+			{
+				/* wait until the transmission is complete */
+				;
+			}
+		}
 		
 		switch(g_STATE) 
 		{
@@ -314,14 +244,9 @@ main(void)
 			break;
 		  
 			case MOTIONDETECTED:
-				status = 1;
-				transmit_to_uno(status);
 				printf("State: MOTIONDETECTED\n\r");
 				PORTB |=  (1 << PB7);
-				_delay_ms(500);
-				
 				input_password(password_length);
-				
 				password_state = compare_passwords(stored_password, g_user_given_password, 4);
 				if (password_state != 0)
 				{
