@@ -216,12 +216,20 @@ main(void)
 			Three different states: ARMED, MOTIONDETECTED and DISARMED
 		*/
 		
-		/* send byte to slave and receive a byte from slave */
+		// HOW TO CONNECT THE UNO AND MEGA:
+		// mega -> uno
+		// digital 52 -> digital 13
+		// digital 50 -> digital 12
+		// digital 51 -> digital 11
+		// digital 53 -> digital 10
+		// ALSO CONNECT THE GROUND WIRES
+		
+		/* send byte to slave */
 		PORTB &= ~(1 << PB0); // SS LOW
 		for(int8_t spi_data_index = 0; spi_data_index < sizeof(spi_send_data); spi_data_index++)
 		{
 			
-			SPDR = spi_send_data; // send byte using SPI data register
+			SPDR = g_STATE; // send byte using SPI data register
 			
 			while(!(SPSR & (1 << SPIF)))
 			{
@@ -253,13 +261,19 @@ main(void)
 					PORTB |=   (1 << PB6);
 					g_STATE = 2;
 				}
-				
+				else
+				{
+					g_STATE = 1;
+				}
 			break;
 		  
 			case DISARMED:
 				printf("State: UNARMED\n\r");
-				_delay_ms(1000);
+				_delay_ms(2000);
+				g_STATE = 0;
+				PORTB &= ~(1 << PB6);
 		}
+		_delay_ms(1000);
 	}
 	
 	return 0;

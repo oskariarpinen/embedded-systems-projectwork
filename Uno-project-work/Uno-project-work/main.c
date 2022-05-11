@@ -20,9 +20,7 @@
 
 #define LISTENING 0
 #define ALARM 1
-#define WRONGPASSWORD 2
-#define TIMEOUT 3
-#define UNARMED 4
+#define UNARMED 2
 
 volatile int8_t g_STATE = LISTENING;
 
@@ -127,16 +125,22 @@ main(void)
     {
 		
 		spi_receive_data = SPDR;
+		g_STATE = spi_receive_data;
+		
+		printf("%d\n\r",spi_receive_data);
 		
 		switch (g_STATE)
 		{
 			case LISTENING:
 				TCCR1B &= ~(1 << 0);
+				printf("Listening...\n\r");
 				
 			break;
 			
 			case ALARM:
 				TCCR1B |= (1 << 0);
+				_delay_ms(500);
+				TCCR1B &= ~(1 << 0);
 				printf("ALARM!!\n\r");
 			break;
 			
