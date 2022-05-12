@@ -24,6 +24,10 @@ volatile int8_t g_STATE = 0;
 #define ARMED 0
 #define MOTIONDETECTED 1
 #define DISARMED 2
+#define RESET 3
+#define TIMEOUT 4
+
+#define TIMELIMIT 150
 
 int8_t g_user_given_password[4];
 
@@ -76,12 +80,13 @@ FILE uart_input = FDEV_SETUP_STREAM(NULL, USART_Receive, _FDEV_SETUP_READ);
 
 
 
-void
+int
 input_password(int password_length){
 	
 	/* This function is responsible for the keypad password input */
 	
 	int index = 0;
+	int timer = 0;
 	int8_t temp_read = 122;
 	
 	KEYPAD_Init();
@@ -101,7 +106,12 @@ input_password(int password_length){
 		// If the press is "#", exits the input loop
 		if (temp_read == 35)
 		{
-			break;
+			return 1;
+		}
+		
+		if (timer >= TIMELIMIT)
+		{
+			return 0; 
 		}
 		
 		// If the press is 0-9 & the index is not above 3
@@ -142,6 +152,7 @@ input_password(int password_length){
 		}
 		
 		_delay_ms(100);
+		timer++;
 	}
 }
 
@@ -184,19 +195,17 @@ main(void)
   
 	// Motion sensor input pin, MEGA pin 2
 	DDRE &= ~(1 << PE4);
-  
-	// Alarm output, MEGA pin 13
-	DDRB |= (1 << PB7);
 	
-	// Disarmed led, MEGA pin 12
-	DDRB |= (1 << PB6);
+	// Reset button pin 
+	DDRA &= ~(1 << PA2);
   
 	// Motion sensor state variable
 	bool s_sensor_state = 0;
-
+	bool b_resetbutton_state = 0;
 	bool password_state = 0;
 	
 	int password_length = 4;
+	int timeout = 0;
 	
 	int8_t status;
 	
@@ -226,23 +235,19 @@ main(void)
 		
 		/* send byte to slave */
 		PORTB &= ~(1 << PB0); // SS LOW
-		for(int8_t spi_data_index = 0; spi_data_index < sizeof(spi_send_data); spi_data_index++)
+		SPDR = g_STATE; // send byte using SPI data register
+		while(!(SPSR & (1 << SPIF)))
 		{
-			
-			SPDR = g_STATE; // send byte using SPI data register
-			
-			while(!(SPSR & (1 << SPIF)))
-			{
-				/* wait until the transmission is complete */
-				;
-			}
+			/* wait until the transmission is complete */
+			;
 		}
+		
+		
 		
 		switch(g_STATE) 
 		{
 			case ARMED:
 				printf("State: ARMED\n\r");
-				PORTB &= ~(1 << PB7);
 				s_sensor_state = (PINE & (1 << PE4));
 				if (0 != s_sensor_state)
 				{
@@ -254,24 +259,69 @@ main(void)
 			case MOTIONDETECTED:
 				printf("State: MOTIONDETECTED\n\r");
 				PORTB |=  (1 << PB7);
-				input_password(password_length);
+				timeout = input_password(password_length);
+				if (timeout == 0)
+				{
+					printf("Timeout\n\r");
+					_delay_ms(1000);						
+					g_STATE = TIMEOUT;
+					continue;
+				}
 				password_state = compare_passwords(stored_password, g_user_given_password, 4);
 				if (password_state != 0)
 				{
-					PORTB |=   (1 << PB6);
-					g_STATE = 2;
+					g_STATE = DISARMED;
 				}
 				else
 				{
-					g_STATE = 1;
+					SPDR = 5;
+					while(!(SPSR & (1 << SPIF)))
+					{
+						/* wait until the transmission is complete */
+						;
+					}
+					_delay_ms(1500);
 				}
 			break;
 		  
 			case DISARMED:
-				printf("State: UNARMED\n\r");
-				_delay_ms(2000);
-				g_STATE = 0;
-				PORTB &= ~(1 << PB6);
+				printf("State: DISARMED\n\r");
+				b_resetbutton_state = (PINA & (1 << PA2));
+				if (b_resetbutton_state != 0)
+				{
+					SPDR = 3;
+					while(!(SPSR & (1 << SPIF)))
+					{
+						/* wait until the transmission is complete */
+						;
+					}
+					g_STATE = RESET;
+					_delay_ms(1000);
+					continue;
+				}
+			break;
+			
+			case RESET:
+				printf("Resetting...\n\r");
+				SPDR = 0;
+				while(!(SPSR & (1 << SPIF)))
+				{
+					/* wait until the transmission is complete */
+					;
+				}
+				_delay_ms(1000);
+				g_user_given_password[0] = 0;
+				g_user_given_password[1] = 0;
+				g_user_given_password[2] = 0;
+				g_user_given_password[3] = 0;
+				_delay_ms(5000);
+				g_STATE = ARMED;
+			break;
+			
+			case TIMEOUT:
+				printf("TIMEOUT\n\r");
+			break;	
+				
 		}
 		_delay_ms(1000);
 	}

@@ -21,6 +21,9 @@
 #define LISTENING 0
 #define ALARM 1
 #define UNARMED 2
+#define RESET 3
+#define TIMEOUT 4
+#define INCORRECTPSWRD 5
 
 volatile int8_t g_STATE = LISTENING;
 
@@ -97,27 +100,33 @@ main(void)
     TCCR1B  = 0; // reset timer/counter 1
     TCNT1   = 0;
     TCCR1A |= (1 << 6); // set compare output mode to toggle
-    // TCCR1A |= 0b01000000;
-    // TCCR1A |= 0x40;
     
     // mode 9 phase correct
     TCCR1A |= (1 << 0); // set register A WGM[1:0] bits
     // TCCR1A |= 0b00000001;
     TCCR1B |= (1 << 4); // set register B WBM[3:2] bits
     // TCCR1B |= 0b00010000;
-    
     TIMSK1 |= (1 << 1); // enable compare match A interrupt
     // TIMSK1 |= 0b00000100;
     
-    OCR1A = 15297; // C5 523 Hz, no prescaler
-    //OCR1A = 2462;   // A7 3250 Hz, no prescaler, calculated
-    //OCR1A = 2440;   // A7 3250 Hz, no prescaler, empirical
-    //OCR1A = 1016;   // B2  123 Hz, 64 prescaler	
+    OCR1A = 15297; // C5 523 Hz, no prescaler	
 	
 	/* set MISO as output, pin 12 (PB4)*/
 	DDRB  = (1 << PB4);
 	/* set SPI enable */
 	SPCR  = (1 << 6);
+	
+	// Pin for the red LED, arduino pin 7
+	DDRD |= (1 << PD7);
+	
+	// Pin for the green LED, arduino pin 6
+	DDRD |= (1 << PD6);
+	
+	// Pin for the yellow LED, arduino pin 5
+	DDRD |= (1 << PD5);
+	
+	//Pin for the active buzzer, arduino pin 4
+	DDRD |= (1 << PD4);
 	
 	unsigned int spi_receive_data = 0;
 	
@@ -126,29 +135,67 @@ main(void)
 		
 		spi_receive_data = SPDR;
 		g_STATE = spi_receive_data;
-		
-		printf("%d\n\r",spi_receive_data);
-		
+
 		switch (g_STATE)
 		{
 			case LISTENING:
+				PORTD &=  ~(1 << PD6);
+				
 				TCCR1B &= ~(1 << 0);
-				printf("Listening...\n\r");
+				printf("System is active..\n\r");
 				
 			break;
 			
 			case ALARM:
-				TCCR1B |= (1 << 0);
-				_delay_ms(500);
-				TCCR1B &= ~(1 << 0);
-				printf("ALARM!!\n\r");
+				//Turn off green led
+				PORTD &=  ~(1 << PD6);
+				
+				//Turn on yellow led
+				PORTD |=  (1 << PD5);
+
+				printf("Motion detected. Input password...\n\r");
 			break;
 			
 			case UNARMED:
+				//Turn on green led
+				PORTD |=  (1 << PD6);
+				
+				// Turn off yellow led
+				PORTD &=  ~(1 << PD5);
+				
 				TCCR1B &= ~(1 << 0);
-				printf("Unarmed\n\r");
+				printf("System is unarmed. Press reset button to rearm the system. \n\r");
+				
+			break;
+			
+			case RESET:
+				printf("The system is resetting\n\r");
+				printf("Motion detection active in:\n\r");
+				g_STATE = 0;
+				for (int i = 6; i >= 1; --i)
+				{
+					printf("%d\n\r",i);
+					_delay_ms(1000);
+				}
+			break; 
+			
+			case TIMEOUT:
+				PORTD |=  (1 << PD7);
+				PORTD |=  (1 << PD4);
+				TCCR1B |= (1 << 0);
+				printf("TIMEOUT! ALARM! TIMEOUT! \n\r");
+				_delay_ms(500);
+				PORTD &=  ~(1 << PD7);
+				TCCR1B &= ~(1 << 0);
+				PORTD &=  ~(1 << PD4);
+			break;
+			
+			case INCORRECTPSWRD:
+				printf("Incorrect password. Try again. \n\r");
+				_delay_ms(1000);
+			break;		
 		}
 		
-		_delay_ms(1000);
+		_delay_ms(500);
     }
 }

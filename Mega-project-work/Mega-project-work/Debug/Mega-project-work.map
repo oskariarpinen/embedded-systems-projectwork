@@ -37,7 +37,7 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 delay.o
  .text.DELAY_sec
                 0x0000000000000000       0x1c delay.o
- .debug_info    0x0000000000000000      0x33f delay.o
+ .debug_info    0x0000000000000000      0x366 delay.o
  .debug_abbrev  0x0000000000000000       0xbb delay.o
  .debug_loc     0x0000000000000000       0x70 delay.o
  .debug_aranges
@@ -452,28 +452,28 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0x19eb
+.debug_info     0x0000000000000000     0x1b3b
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000      0xbbc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr6/memx-const/crtatmega2560.o
- .debug_info    0x0000000000000bbc      0x4d9 keypad.o
- .debug_info    0x0000000000001095      0x956 main.o
+ .debug_info    0x0000000000000bbc      0x500 keypad.o
+ .debug_info    0x00000000000010bc      0xa7f main.o
 
-.debug_abbrev   0x0000000000000000      0xf2b
+.debug_abbrev   0x0000000000000000      0xf06
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000      0xb1a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr6/memx-const/crtatmega2560.o
  .debug_abbrev  0x0000000000000b1a      0x12c keypad.o
- .debug_abbrev  0x0000000000000c46      0x2e5 main.o
+ .debug_abbrev  0x0000000000000c46      0x2c0 main.o
 
-.debug_line     0x0000000000000000      0x7d5
+.debug_line     0x0000000000000000      0x882
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000      0x1fd C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr6/memx-const/crtatmega2560.o
  .debug_line    0x00000000000001fd      0x26a keypad.o
- .debug_line    0x0000000000000467      0x36e main.o
+ .debug_line    0x0000000000000467      0x41b main.o
 
-.debug_frame    0x0000000000000000      0x100
+.debug_frame    0x0000000000000000      0x108
  *(.debug_frame)
  .debug_frame   0x0000000000000000       0x64 keypad.o
- .debug_frame   0x0000000000000064       0x9c main.o
+ .debug_frame   0x0000000000000064       0xa4 main.o
 
 .debug_str      0x0000000000000000      0x430
  *(.debug_str)
@@ -481,10 +481,10 @@ END GROUP
  .debug_str     0x00000000000003e6       0x10 keypad.o
  .debug_str     0x00000000000003f6       0x3a main.o
 
-.debug_loc      0x0000000000000000      0x683
+.debug_loc      0x0000000000000000      0x801
  *(.debug_loc)
  .debug_loc     0x0000000000000000      0x2c5 keypad.o
- .debug_loc     0x00000000000002c5      0x3be main.o
+ .debug_loc     0x00000000000002c5      0x53c main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -524,154 +524,154 @@ LOAD data_init
  .bss.g_STATE   0x0000000000800228        0x1 main.o
                 0x0000000000800228                g_STATE
 
-.progmemx.data  0x000000000000028e       0x38
+.progmemx.data  0x000000000000028e       0x5c
  .progmemx.data
-                0x000000000000028e       0x38 main.o
+                0x000000000000028e       0x5c main.o
 
-.text.avrlibc   0x00000000000002c6      0x450
- .text.avrlibc  0x00000000000002c6      0x450 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(vfprintf_std.o)
-                0x00000000000002c6                vfprintf
+.text.avrlibc   0x00000000000002ea      0x450
+ .text.avrlibc  0x00000000000002ea      0x450 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(vfprintf_std.o)
+                0x00000000000002ea                vfprintf
 
-.text.main      0x0000000000000716      0x15c
- .text.main     0x0000000000000716      0x15c main.o
-                0x0000000000000716                main
+.text.main      0x000000000000073a      0x212
+ .text.main     0x000000000000073a      0x212 main.o
+                0x000000000000073a                main
 
 .text.input_password
-                0x0000000000000872       0xd6
+                0x000000000000094c       0xfa
  .text.input_password
-                0x0000000000000872       0xd6 main.o
-                0x0000000000000872                input_password
+                0x000000000000094c       0xfa main.o
+                0x000000000000094c                input_password
 
-.text.avrlibc   0x0000000000000948       0xbc
- .text.avrlibc  0x0000000000000948       0xbc c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(ultoa_invert.o)
-                0x0000000000000948                __ultoa_invert
+.text.avrlibc   0x0000000000000a46       0xbc
+ .text.avrlibc  0x0000000000000a46       0xbc c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(ultoa_invert.o)
+                0x0000000000000a46                __ultoa_invert
 
-.text.avrlibc   0x0000000000000a04       0x78
- .text.avrlibc  0x0000000000000a04       0x78 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(fputc.o)
-                0x0000000000000a04                fputc
+.text.avrlibc   0x0000000000000b02       0x78
+ .text.avrlibc  0x0000000000000b02       0x78 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(fputc.o)
+                0x0000000000000b02                fputc
 
 .text.KEYPAD_GetKey
-                0x0000000000000a7c       0x6e
+                0x0000000000000b7a       0x6e
  .text.KEYPAD_GetKey
-                0x0000000000000a7c       0x6e keypad.o
-                0x0000000000000a7c                KEYPAD_GetKey
+                0x0000000000000b7a       0x6e keypad.o
+                0x0000000000000b7a                KEYPAD_GetKey
 
 .text.compare_passwords
-                0x0000000000000aea       0x3c
+                0x0000000000000be8       0x3c
  .text.compare_passwords
-                0x0000000000000aea       0x3c main.o
-                0x0000000000000aea                compare_passwords
+                0x0000000000000be8       0x3c main.o
+                0x0000000000000be8                compare_passwords
 
-.text.avrlibc   0x0000000000000b26       0x38
- .text.avrlibc  0x0000000000000b26       0x38 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(strnlen_M.o)
-                0x0000000000000b26                strnlen
+.text.avrlibc   0x0000000000000c24       0x38
+ .text.avrlibc  0x0000000000000c24       0x38 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(strnlen_M.o)
+                0x0000000000000c24                strnlen
 
 .text.keypad_ScanKey
-                0x0000000000000b5e       0x30
+                0x0000000000000c5c       0x30
  .text.keypad_ScanKey
-                0x0000000000000b5e       0x30 keypad.o
+                0x0000000000000c5c       0x30 keypad.o
 
-.text.avrlibc   0x0000000000000b8e       0x2a
- .text.avrlibc  0x0000000000000b8e       0x2a c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(printf.o)
-                0x0000000000000b8e                printf
+.text.avrlibc   0x0000000000000c8c       0x2a
+ .text.avrlibc  0x0000000000000c8c       0x2a c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6/memx-const\libc.a(printf.o)
+                0x0000000000000c8c                printf
 
 .text.USART_init
-                0x0000000000000bb8       0x1e
+                0x0000000000000cb6       0x1e
  .text.USART_init
-                0x0000000000000bb8       0x1e main.o
+                0x0000000000000cb6       0x1e main.o
 
-.text.libgcc    0x0000000000000bd6       0x10
- .text.libgcc   0x0000000000000bd6       0x10 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr6/memx-const\libgcc.a(_tablejump2.o)
-                0x0000000000000bd6                __tablejump2__
+.text.libgcc    0x0000000000000cd4       0x10
+ .text.libgcc   0x0000000000000cd4       0x10 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr6/memx-const\libgcc.a(_tablejump2.o)
+                0x0000000000000cd4                __tablejump2__
 
 .text.USART_Transmit
-                0x0000000000000be6        0xe
+                0x0000000000000ce4        0xe
  .text.USART_Transmit
-                0x0000000000000be6        0xe main.o
+                0x0000000000000ce4        0xe main.o
 
 .text.USART_Receive
-                0x0000000000000bf4        0xe
+                0x0000000000000cf2        0xe
  .text.USART_Receive
-                0x0000000000000bf4        0xe main.o
+                0x0000000000000cf2        0xe main.o
 
-.text.libgcc    0x0000000000000c02        0xe
- .text.libgcc   0x0000000000000c02        0xe c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr6/memx-const\libgcc.a(_xload_1.o)
-                0x0000000000000c02                __xload_1
+.text.libgcc    0x0000000000000d00        0xe
+ .text.libgcc   0x0000000000000d00        0xe c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr6/memx-const\libgcc.a(_xload_1.o)
+                0x0000000000000d00                __xload_1
 
 .text.KEYPAD_Init
-                0x0000000000000c10        0x8
+                0x0000000000000d0e        0x8
  .text.KEYPAD_Init
-                0x0000000000000c10        0x8 keypad.o
-                0x0000000000000c10                KEYPAD_Init
+                0x0000000000000d0e        0x8 keypad.o
+                0x0000000000000d0e                KEYPAD_Init
 
-.text           0x0000000000000c18        0x4
- .text          0x0000000000000c18        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr6/memx-const/crtatmega2560.o
-                0x0000000000000c18                __vector_38
-                0x0000000000000c18                __vector_22
-                0x0000000000000c18                __vector_28
-                0x0000000000000c18                __vector_1
-                0x0000000000000c18                __vector_32
-                0x0000000000000c18                __vector_34
-                0x0000000000000c18                __vector_24
-                0x0000000000000c18                __vector_12
-                0x0000000000000c18                __vector_55
-                0x0000000000000c18                __vector_46
-                0x0000000000000c18                __bad_interrupt
-                0x0000000000000c18                __vector_6
-                0x0000000000000c18                __vector_31
-                0x0000000000000c18                __vector_35
-                0x0000000000000c18                __vector_39
-                0x0000000000000c18                __vector_3
-                0x0000000000000c18                __vector_23
-                0x0000000000000c18                __vector_30
-                0x0000000000000c18                __vector_45
-                0x0000000000000c18                __vector_25
-                0x0000000000000c18                __vector_11
-                0x0000000000000c18                __vector_54
-                0x0000000000000c18                __vector_13
-                0x0000000000000c18                __vector_17
-                0x0000000000000c18                __vector_19
-                0x0000000000000c18                __vector_56
-                0x0000000000000c18                __vector_7
-                0x0000000000000c18                __vector_49
-                0x0000000000000c18                __vector_41
-                0x0000000000000c18                __vector_43
-                0x0000000000000c18                __vector_27
-                0x0000000000000c18                __vector_5
-                0x0000000000000c18                __vector_33
-                0x0000000000000c18                __vector_47
-                0x0000000000000c18                __vector_52
-                0x0000000000000c18                __vector_37
-                0x0000000000000c18                __vector_4
-                0x0000000000000c18                __vector_44
-                0x0000000000000c18                __vector_51
-                0x0000000000000c18                __vector_9
-                0x0000000000000c18                __vector_2
-                0x0000000000000c18                __vector_21
-                0x0000000000000c18                __vector_15
-                0x0000000000000c18                __vector_36
-                0x0000000000000c18                __vector_29
-                0x0000000000000c18                __vector_40
-                0x0000000000000c18                __vector_8
-                0x0000000000000c18                __vector_26
-                0x0000000000000c18                __vector_48
-                0x0000000000000c18                __vector_14
-                0x0000000000000c18                __vector_53
-                0x0000000000000c18                __vector_10
-                0x0000000000000c18                __vector_50
-                0x0000000000000c18                __vector_16
-                0x0000000000000c18                __vector_18
-                0x0000000000000c18                __vector_20
-                0x0000000000000c18                __vector_42
+.text           0x0000000000000d16        0x4
+ .text          0x0000000000000d16        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr6/memx-const/crtatmega2560.o
+                0x0000000000000d16                __vector_38
+                0x0000000000000d16                __vector_22
+                0x0000000000000d16                __vector_28
+                0x0000000000000d16                __vector_1
+                0x0000000000000d16                __vector_32
+                0x0000000000000d16                __vector_34
+                0x0000000000000d16                __vector_24
+                0x0000000000000d16                __vector_12
+                0x0000000000000d16                __vector_55
+                0x0000000000000d16                __vector_46
+                0x0000000000000d16                __bad_interrupt
+                0x0000000000000d16                __vector_6
+                0x0000000000000d16                __vector_31
+                0x0000000000000d16                __vector_35
+                0x0000000000000d16                __vector_39
+                0x0000000000000d16                __vector_3
+                0x0000000000000d16                __vector_23
+                0x0000000000000d16                __vector_30
+                0x0000000000000d16                __vector_45
+                0x0000000000000d16                __vector_25
+                0x0000000000000d16                __vector_11
+                0x0000000000000d16                __vector_54
+                0x0000000000000d16                __vector_13
+                0x0000000000000d16                __vector_17
+                0x0000000000000d16                __vector_19
+                0x0000000000000d16                __vector_56
+                0x0000000000000d16                __vector_7
+                0x0000000000000d16                __vector_49
+                0x0000000000000d16                __vector_41
+                0x0000000000000d16                __vector_43
+                0x0000000000000d16                __vector_27
+                0x0000000000000d16                __vector_5
+                0x0000000000000d16                __vector_33
+                0x0000000000000d16                __vector_47
+                0x0000000000000d16                __vector_52
+                0x0000000000000d16                __vector_37
+                0x0000000000000d16                __vector_4
+                0x0000000000000d16                __vector_44
+                0x0000000000000d16                __vector_51
+                0x0000000000000d16                __vector_9
+                0x0000000000000d16                __vector_2
+                0x0000000000000d16                __vector_21
+                0x0000000000000d16                __vector_15
+                0x0000000000000d16                __vector_36
+                0x0000000000000d16                __vector_29
+                0x0000000000000d16                __vector_40
+                0x0000000000000d16                __vector_8
+                0x0000000000000d16                __vector_26
+                0x0000000000000d16                __vector_48
+                0x0000000000000d16                __vector_14
+                0x0000000000000d16                __vector_53
+                0x0000000000000d16                __vector_10
+                0x0000000000000d16                __vector_50
+                0x0000000000000d16                __vector_16
+                0x0000000000000d16                __vector_18
+                0x0000000000000d16                __vector_20
+                0x0000000000000d16                __vector_42
 
 .data.uart_input
-                0x000000000080020a        0xf load address 0x0000000000000c1c
+                0x000000000080020a        0xf load address 0x0000000000000d1a
  .data.uart_input
                 0x000000000080020a        0xf main.o
                 0x000000000080020a                uart_input
 
 .data.uart_output
-                0x0000000000800219        0xf load address 0x0000000000000c2b
+                0x0000000000800219        0xf load address 0x0000000000000d29
  .data.uart_output
                 0x0000000000800219        0xf main.o
                 0x0000000000800219                uart_output
