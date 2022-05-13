@@ -11,6 +11,7 @@
 #define MYUBRR (FOSC/16/BAUD-1)
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include <util/setbaud.h>
 #include <stdio.h>
@@ -27,7 +28,7 @@ volatile int8_t g_STATE = 0;
 #define RESET 3
 #define TIMEOUT 4
 
-#define TIMELIMIT 150
+#define TIMELIMIT 300
 
 int8_t g_user_given_password[4];
 
@@ -175,6 +176,12 @@ compare_passwords(int8_t stored_password[], int8_t given_password[], int passwor
 	return 1;
 }
 
+ISR
+(TIMER3_COMPA_vect)
+{
+	TCNT3 = 0; // reset timer counter
+}
+
 int
 main(void)
 {
@@ -218,6 +225,23 @@ main(void)
 	
 	unsigned int spi_send_data = 1;
 	
+	// BUZZER SETUP
+	/* set up the ports and pins */
+	DDRE |= (1 << PE3); // OC3A is located in digital pin 5
+	   
+	// Enable interrupts command
+	sei();
+	 
+	/* set up the 16-bit timer/counter3, mode 9 */
+	TCCR3B = 0; // reset timer/counter 3
+	TCNT3  = 0;
+	TCCR3A |= (1 << 6); // set compare output mode to toggle
+	// mode 9 phase correct
+	TCCR3A |= (1 << 0); // set register A WGM[1:0] bits
+	TCCR3B |= (1 << 4); // set register B WBM[3:2] bits
+	TIMSK3 |= (1 << 1); // enable compare match A interrup
+	OCR3A = 15296; //  C5 523 Hz, no prescaler
+	
 	while (1)
 	{
 		/* 
@@ -248,6 +272,7 @@ main(void)
 		{
 			case ARMED:
 				printf("State: ARMED\n\r");
+				// Read movement sensor state
 				s_sensor_state = (PINE & (1 << PE4));
 				if (0 != s_sensor_state)
 				{
@@ -259,17 +284,22 @@ main(void)
 			case MOTIONDETECTED:
 				printf("State: MOTIONDETECTED\n\r");
 				PORTB |=  (1 << PB7);
+				
+				// Go to password input subroutine
 				timeout = input_password(password_length);
 				if (timeout == 0)
 				{
+					// If timeout occured, change state to timeout
 					printf("Timeout\n\r");
 					_delay_ms(1000);						
 					g_STATE = TIMEOUT;
 					continue;
 				}
+				// Compare passwords with function created
 				password_state = compare_passwords(stored_password, g_user_given_password, 4);
 				if (password_state != 0)
 				{
+					// Disarms system if passwords match
 					g_STATE = DISARMED;
 				}
 				else
@@ -286,6 +316,7 @@ main(void)
 		  
 			case DISARMED:
 				printf("State: DISARMED\n\r");
+				// Read reset button status
 				b_resetbutton_state = (PINA & (1 << PA2));
 				if (b_resetbutton_state != 0)
 				{
@@ -295,6 +326,7 @@ main(void)
 						/* wait until the transmission is complete */
 						;
 					}
+					// Change state
 					g_STATE = RESET;
 					_delay_ms(1000);
 					continue;
@@ -303,6 +335,7 @@ main(void)
 			
 			case RESET:
 				printf("Resetting...\n\r");
+				// Send int to Uno
 				SPDR = 0;
 				while(!(SPSR & (1 << SPIF)))
 				{
@@ -310,6 +343,8 @@ main(void)
 					;
 				}
 				_delay_ms(1000);
+				
+				// Reset password
 				g_user_given_password[0] = 0;
 				g_user_given_password[1] = 0;
 				g_user_given_password[2] = 0;
@@ -319,7 +354,10 @@ main(void)
 			break;
 			
 			case TIMEOUT:
+				TCCR3B |= (1 << 0);
 				printf("TIMEOUT\n\r");
+				_delay_ms(500);
+				TCCR3B &= ~(1 << 0);
 			break;	
 				
 		}
